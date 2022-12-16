@@ -1,7 +1,5 @@
 provider "aws" {
     region = "us-east-2"
-   # source  = "hashicorp/aws"
-   # version = "3.74.0"
     shared_credentials_file = "/home/ubuntu/.aws/credentials"
 }
 
@@ -16,7 +14,6 @@ module "vpc" {
   public_subnets  = ["30.0.101.0/24", "30.0.102.0/24",]
 
   enable_nat_gateway = true
-#  enable_vpn_gateway = true
 
   tags = {
     Terraform = "true"

@@ -32,14 +32,14 @@ resource "aws_security_group" "prajwal-sg-mongo" {
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
-    cidr_blocks      = [module.vpc.vpc_cidr_block]
+    security_groups = [aws_security_group.prajwal-sg-bastion.id]
   }
  ingress {
     description      = "TLS from VPC"
     from_port        = 27017
     to_port          = 27017
     protocol         = "tcp"
-    cidr_blocks      = [module.vpc.vpc_cidr_block]
+    self             = true
   }
   egress {
     from_port        = 0
