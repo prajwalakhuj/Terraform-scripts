@@ -32,7 +32,7 @@ resource "aws_security_group" "prajwal-sg-mongo" {
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
-    security_groups = [aws_security_group.prajwal-sg-bastion.id]
+    security_groups = [aws_security_group.prajwal-sg-vpn.id]
   }
  ingress {
     description      = "TLS from VPC"
@@ -62,13 +62,13 @@ module "ec2_instance_bastion"   {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "~> 3.0"
 
-  name = "prajwal-bastion-tf"
+  name = "prajwal-vpn-tf"
 
   ami                    = "ami-0ada6d94f396377f2"
   instance_type          = "t3a.small"
   key_name               = "prajwal-key-aws"
   monitoring             = true
-  vpc_security_group_ids = [resource.aws_security_group.prajwal-sg-bastion.id]
+  vpc_security_group_ids = [resource.aws_security_group.prajwal-sg-vpn.id]
   subnet_id              = module.vpc.public_subnets[0]
   tags = {
     Terraform   = "true"
@@ -77,8 +77,8 @@ module "ec2_instance_bastion"   {
 }
 
 ## Security Group of Bastion host
-resource "aws_security_group" "prajwal-sg-bastion" {
-  name        = "prajwal-sg-bastion-tf"
+resource "aws_security_group" "prajwal-sg-vpn" {
+  name        = "prajwal-sg-vpn-tf"
   description = "Allow TLS inbound and outbund traffic"
   vpc_id      = module.vpc.vpc_id
 
@@ -109,7 +109,7 @@ resource "aws_security_group" "prajwal-sg-bastion" {
     ipv6_cidr_blocks = ["::/0"]
   }
   tags = {
-    Name = "prajwal-sg-bastion"
+    Name = "prajwal-sg-vpn"
     owner = "prajwal"
     terraform = true
     env = "dev"
