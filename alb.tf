@@ -1,18 +1,14 @@
-provider "aws" {
-    region = "us-east-2"
-    shared_credentials_file = "/home/ubuntu/.aws/credentials"
-}
+## Load Balancer [ALB]
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 8.0"
 
-  name = "prajwal-alb-tf"
-
+  name = "prajwal-alb-nodejs"
   load_balancer_type = "application"
 
-  vpc_id             = "vpc-0d3fee4b9a82341f3"
-  subnets            = ["subnet-08b59fb054dbba0dd", "subnet-0e5794508390edf53"]
-  security_groups    = ["sg-0bdace4237eb8e231"]
+  vpc_id             = module.vpc.vpc_id
+  subnets            = module.vpc.public_subnets
+  security_groups    = [resource.aws_security_group.prajwal-sg-lb.id]
 
   target_groups = [
     {
@@ -21,7 +17,6 @@ module "alb" {
       target_type      = "instance"
     }
   ]
-
   https_listeners = [
     {
       port               = 443
@@ -30,7 +25,6 @@ module "alb" {
       target_group_index = 0
     }
   ]
-
   http_tcp_listeners = [
     {
       port               = 80
@@ -38,8 +32,42 @@ module "alb" {
       target_group_index = 0
     }
   ]
-
   tags = {
-    Environment = "Test"
+    env = "dev"
+    Name = "prajwal-tg"
+  }
+}
+
+## SG for ALB
+resource "aws_security_group" "prajwal-sg-lb" {
+  name        = "prajwal-sg-lb"
+  description = "Allow TLS inbound and outbund traffic"
+  vpc_id      = module.vpc.vpc_id
+  ingress {
+    description      = "TLS from VPC"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  ingress {
+    description      = "TLS from VPC"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  tags = {
+    Name = "prajwal-sg-lb"
+    owner = "prajwal"
+    env = "dev"
+    terraform = true
   }
 }
