@@ -1,9 +1,6 @@
 #!/bin/bash
 
 sleep 30
-sudo apt update && sudo apt upgrade -y
-sudo apt autoremove --purge
-sudo apt autoclean
 
 # Nodejs Installation
 
